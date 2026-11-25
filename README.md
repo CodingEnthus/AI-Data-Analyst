@@ -24,8 +24,9 @@ An intelligent AI-powered Data Analyst built using **LangGraph**, **LangChain**,
 |----------|--------------|
 | Language | Python |
 | AI Framework | LangChain, LangGraph |
+| Machine Learning | Scikit-Learn, Scipy, Joblib |
 | LLM | Groq |
-| Data Processing | Pandas |
+| Data Processing | Pandas, DuckDB |
 | Visualization | Plotly |
 | Environment | Python Virtual Environment |
 | Version Control | Git & GitHub |
@@ -47,8 +48,27 @@ AI_Data_Analyst/
 │   ├── __init__.py
 │   ├── dataset_tools.py
 │   ├── statistics_tools.py
+│   ├── duckdb_tools.py
 │   ├── visualization_tools.py
-│   └── helper_tools.py
+│   ├── helper_tools.py
+│   └── ml_tools.py
+│
+├── ml_engine/
+│   ├── __init__.py
+│   ├── preprocessing.py
+│   ├── anomaly_detection.py
+│   ├── classification.py
+│   ├── regression.py
+│   ├── clustering.py
+│   ├── evaluation.py
+│   └── model_manager.py
+│
+├── models/
+│   └── .gitkeep
+│
+├── tests/
+│   ├── test_ml_engine.py
+│   └── run_tests.py
 │
 ├── outputs/
 │   ├── charts/
@@ -82,8 +102,20 @@ AI_Data_Analyst/
 - Histogram
 - Pie Chart
 - Heatmap
+- Box Plot
+- Violin Plot
 
 Interactive charts are automatically saved in the `outputs/charts/` directory.
+
+---
+
+## 🤖 Machine Learning Engine (Stage 1)
+
+- **🚨 Anomaly Detection (Isolation Forest)**: Flags potential statistical outliers and calculates normalized severity scores ($[0, 1]$).
+- **🎯 Supervised Classification (Random Forest)**: Binary and multiclass predictive modeling with stratified train/test split, zero data leakage, confusion matrix, and feature importances.
+- **📈 Supervised Regression (Random Forest)**: Continuous prediction with MAE, MSE, RMSE, and $R^2$, paired with Actual vs. Predicted and Residual distribution plots.
+- **🔍 Unsupervised Clustering (K-Means)**: Natural grouping on normalized features with cluster profiles, inertia, optional Elbow analysis, and 2D PCA cluster visualizations.
+- **💾 Model Persistence & Schema Validation**: Serializes models with `joblib` into `models/`, validates inference schemas, and logs complete training metadata.
 
 ---
 
@@ -117,6 +149,18 @@ How many unique passenger classes are there?
 
 ---
 
+### SQL Analysis (DuckDB)
+
+```
+Using SQL, show the top 5 highest paying passengers who survived.
+```
+
+```
+Run a SQL query to calculate average age and survival rate grouped by Passenger Class.
+```
+
+---
+
 ### Visualization
 
 ```
@@ -133,6 +177,38 @@ Create a pie chart of Passenger Class.
 
 ```
 Generate a heatmap.
+```
+
+```
+Create a box plot of Fare grouped by Passenger Class.
+```
+
+```
+Generate a violin plot of Age by Sex.
+```
+
+---
+
+### Machine Learning
+
+```
+Find unusual records and statistical outliers in this dataset.
+```
+
+```
+Train a classification model to predict Survived and show its accuracy and feature importances.
+```
+
+```
+Train a regression model to predict Fare and show the R2 score and actual vs predicted chart.
+```
+
+```
+Perform clustering with 3 clusters on Age and Fare to find customer segments.
+```
+
+```
+Evaluate model rf_clf_xxxxxxxx.
 ```
 
 ---
@@ -178,8 +254,16 @@ pip install -r requirements.txt
 
 Create a `.env` file in the project root.
 
-```
+```env
+# Primary Fast Provider (Default)
+LLM_PROVIDER=groq
 GROQ_API_KEY=your_api_key_here
+GROQ_MODEL=qwen/qwen3.8-27b
+
+# Optional Local Offline Provider
+# LLM_PROVIDER=ollama
+OLLAMA_MODEL=qwen3:4b
+OLLAMA_BASE_URL=http://localhost:11434
 ```
 
 > **Note:** Never commit your `.env` file to GitHub.
@@ -188,8 +272,16 @@ GROQ_API_KEY=your_api_key_here
 
 ## ▶️ Running the Project
 
+### Option 1: Streamlit Web UI (Recommended)
+
 ```bash
-python app.py
+streamlit run app.py
+```
+
+### Option 2: Interactive Terminal / CLI Mode
+
+```bash
+python agent.py
 ```
 
 ---

@@ -20,3 +20,8 @@ Thumbs.db
 # Generated outputs
 outputs/charts/*.html
 outputs/reports/*
+
+# Serialized ML model artifacts
+models/*.joblib
+models/*.json
+!models/.gitkeep

@@ -358,3 +358,147 @@ def create_heatmap():
         "chart_path": chart_path
     }
 
+
+@tool
+def create_box_plot(numeric_column: str, category_column: str = ""):
+    """
+    Create a box plot to visualize the distribution and outliers of a numeric column,
+    optionally grouped by a categorical column.
+
+    Args:
+        numeric_column: The numeric column to analyze for distributions/outliers (e.g., 'Age', 'Fare').
+        category_column: Optional categorical column to group boxes by (e.g., 'Pclass', 'Sex').
+
+    Returns:
+        Metadata about the generated chart including 'chart_path' or an error message.
+    """
+    if data_store.df is None:
+        return {
+            "success": False,
+            "message": "No dataset loaded."
+        }
+
+    category_col = category_column.strip() if category_column else None
+
+    if category_col:
+        validation = validate_chart_column(category_col, numeric_column)
+        if not validation["success"]:
+            return validation
+        matched_x = validation["matched_x"]
+        matched_y = validation["matched_y"]
+    else:
+        validation = validate_chart_column(numeric_column)
+        if not validation["success"]:
+            return validation
+        matched_x = None
+        matched_y = validation["matched_x"]
+
+    # If swapped, auto-swap them
+    if matched_x and not pd.api.types.is_numeric_dtype(data_store.df[matched_y]) and pd.api.types.is_numeric_dtype(data_store.df[matched_x]):
+        matched_x, matched_y = matched_y, matched_x
+
+    if not pd.api.types.is_numeric_dtype(data_store.df[matched_y]):
+        return {
+            "success": False,
+            "message": f"'{matched_y}' must be a numeric column for a box plot."
+        }
+
+    if matched_x:
+        fig = px.box(
+            data_store.df,
+            x=matched_x,
+            y=matched_y,
+            points="outliers",
+            title=f"Box Plot of {matched_y} by {matched_x}"
+        )
+    else:
+        fig = px.box(
+            data_store.df,
+            y=matched_y,
+            points="outliers",
+            title=f"Box Plot of {matched_y}"
+        )
+
+    chart_path = save_chart(fig, "box")
+
+    return {
+        "success": True,
+        "chart_type": "box",
+        "numeric_column": matched_y,
+        "category_column": matched_x,
+        "chart_path": chart_path
+    }
+
+
+@tool
+def create_violin_plot(numeric_column: str, category_column: str = ""):
+    """
+    Create a violin plot to display the probability density and distribution of a numeric column,
+    optionally grouped by a categorical column.
+
+    Args:
+        numeric_column: The numeric column to analyze (e.g., 'Age', 'Fare').
+        category_column: Optional categorical column to group violins by (e.g., 'Pclass', 'Sex').
+
+    Returns:
+        Metadata about the generated chart including 'chart_path' or an error message.
+    """
+    if data_store.df is None:
+        return {
+            "success": False,
+            "message": "No dataset loaded."
+        }
+
+    category_col = category_column.strip() if category_column else None
+
+    if category_col:
+        validation = validate_chart_column(category_col, numeric_column)
+        if not validation["success"]:
+            return validation
+        matched_x = validation["matched_x"]
+        matched_y = validation["matched_y"]
+    else:
+        validation = validate_chart_column(numeric_column)
+        if not validation["success"]:
+            return validation
+        matched_x = None
+        matched_y = validation["matched_x"]
+
+    # If swapped, auto-swap them
+    if matched_x and not pd.api.types.is_numeric_dtype(data_store.df[matched_y]) and pd.api.types.is_numeric_dtype(data_store.df[matched_x]):
+        matched_x, matched_y = matched_y, matched_x
+
+    if not pd.api.types.is_numeric_dtype(data_store.df[matched_y]):
+        return {
+            "success": False,
+            "message": f"'{matched_y}' must be a numeric column for a violin plot."
+        }
+
+    if matched_x:
+        fig = px.violin(
+            data_store.df,
+            x=matched_x,
+            y=matched_y,
+            box=True,
+            points="all",
+            title=f"Violin Plot of {matched_y} by {matched_x}"
+        )
+    else:
+        fig = px.violin(
+            data_store.df,
+            y=matched_y,
+            box=True,
+            points="all",
+            title=f"Violin Plot of {matched_y}"
+        )
+
+    chart_path = save_chart(fig, "violin")
+
+    return {
+        "success": True,
+        "chart_type": "violin",
+        "numeric_column": matched_y,
+        "category_column": matched_x,
+        "chart_path": chart_path
+    }
+
